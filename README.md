@@ -26,6 +26,17 @@ Antes de executar o projeto, certifique-se de ter instalado em sua máquina:
 docker-compose up -d
 ```
 
+## Para testar:
+
+Digite no seu terminal "http://localhost"
+
+OU
+
+Digite no terminal:
+```bash
+curl -I http://localhost
+```
+
 ## Como Fazer do Zero pelo CMD, sem Utilizar `docker-compose.yml`
 
 ### 1. Criar a rede Docker
