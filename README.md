@@ -131,4 +131,4 @@ Abra o navegador e acesse:
 http://localhost
 ```
 
-Se tudo estiver configurado corretamente, a aplicação WordPress deverá ser exibida.
+Se tudo estiver configurado corretamente, a aplicação WordPress deverá ser exibida
