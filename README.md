@@ -1,6 +1,6 @@
 # Projeto: Arquitetura de Alta Disponibilidade com WordPress e Nginx
 
-Este projeto implementa uma infraestrutura escalável com Docker, composta por um banco de dados MySQL centralizado, três instâncias da aplicação WordPress e um balanceador de carga Nginx para distribuir o tráfego entre os serviços.
+Esse projeto implementa uma infraestrutura escalável com Docker, composta por um banco de dados MySQL centralizado, três instâncias da aplicação WordPress e um balanceador de carga Nginx para distribuir o tráfego entre os serviços.
 
 ## Estrutura do Projeto
 
