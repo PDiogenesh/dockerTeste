@@ -1,20 +1,23 @@
-# Projeto: Arquitetura de Alta Disponibilidade com WordPress e Nginx
+# Arquitetura de Alta Disponibilidade com WordPress e Nginx
 
-Esse projeto implementa uma infraestrutura escalável com Docker, composta por um banco de dados MySQL centralizado, três instâncias da aplicação WordPress e um balanceador de carga Nginx para distribuir o tráfego entre os serviços.
+Este projeto implementa uma infraestrutura com Docker composta por MySQL, tres instancias WordPress e um balanceador de carga Nginx. O objetivo e distribuir as requisicoes entre as instancias da aplicacao usando Round Robin.
 
-## Trabalho 3 - Testes de Carga com Locust
+## Estrutura
 
-Este projeto tambem inclui um container do Locust para gerar carga contra o Nginx, que e o balanceador de carga das instancias WordPress.
+- `mysql-db`: banco de dados MySQL com armazenamento persistente em `mysql_data/`.
+- `wordpress1`, `wordpress2`, `wordpress3`: instancias da aplicacao WordPress.
+- `nginx`: balanceador de carga na porta `80`.
+- `wordpress-net`: rede Docker bridge usada na comunicacao entre os containers.
+- `locust`: gerador de carga usado nos testes do Trabalho 3.
 
-### Arquivos adicionados
+## Pre-requisitos
 
-- `locust/locustfile.py`: script de teste de carga.
-- `reports/`: pasta onde os CSVs dos testes podem ser salvos.
-- `nginx-1.conf`: Nginx usando somente `wordpress1`.
-- `nginx-2.conf`: Nginx usando `wordpress1` e `wordpress2`.
-- `nginx.conf`: Nginx usando as 3 instancias (`wordpress1`, `wordpress2`, `wordpress3`).
+- Docker
+- Docker Compose
 
-### Subir o ambiente com Locust
+## Executar com Docker Compose
+
+Na pasta do projeto, execute:
 
 ```bash
 docker-compose up -d
@@ -23,162 +26,30 @@ docker-compose up -d
 Depois acesse:
 
 ```text
-http://localhost:8089
+http://localhost
 ```
 
-Na tela do Locust, use:
-
-```text
-Host: http://nginx
-```
-
-### Configurar qual post sera testado
-
-O script usa a variavel `TARGET_PATHS`. Exemplos:
-
-```powershell
-$env:TARGET_PATHS="/?p=1"
-docker-compose up -d --force-recreate locust
-```
-
-```powershell
-$env:TARGET_PATHS="/?p=2"
-docker-compose up -d --force-recreate locust
-```
-
-```powershell
-$env:TARGET_PATHS="/?p=3"
-docker-compose up -d --force-recreate locust
-```
-
-Use o ID real de cada post criado no WordPress:
-
-- Post com imagem de aproximadamente 1 MB: `/?p=5`.
-- Post de aproximadamente 400 KB: `/?p=10`.
-- Post com imagem de aproximadamente 300 KB: `/?p=13`.
-
-### Rodar todos os testes e gerar graficos
-
-O script abaixo executa os 27 testes do trabalho:
-
-```text
-3 posts x 3 quantidades de usuarios x 3 quantidades de instancias WordPress
-```
-
-```powershell
-.\scripts\run-load-tests.ps1
-```
-
-Por padrao, cada teste dura 1 minuto. Para mudar a duracao:
-
-```powershell
-.\scripts\run-load-tests.ps1 -Duration "30s"
-```
-
-Ao final, os CSVs ficam em `reports/` e os graficos ficam em:
-
-```text
-reports/graphs
-```
-
-Se os CSVs ja existirem e voce quiser gerar os graficos novamente:
-
-```powershell
-python scripts/generate-graphs.py
-```
-
-### Variar o numero de instancias do WordPress
-
-Para testar com 1 instancia:
-
-```powershell
-$env:NGINX_CONF="./nginx-1.conf"
-docker-compose up -d --force-recreate nginx
-```
-
-Para testar com 2 instancias:
-
-```powershell
-$env:NGINX_CONF="./nginx-2.conf"
-docker-compose up -d --force-recreate nginx
-```
-
-Para testar com 3 instancias:
-
-```powershell
-$env:NGINX_CONF="./nginx.conf"
-docker-compose up -d --force-recreate nginx
-```
-
-### Rodar teste automatico e gerar CSV
-
-Exemplo com 10 usuarios, taxa de subida de 10 usuarios por segundo e duracao de 1 minuto:
-
-```powershell
-docker-compose exec -e TARGET_PATHS="/?p=1" locust locust -f locustfile.py --host http://nginx --headless -u 10 -r 10 -t 1m --csv reports/cenario1_3wp_10users
-```
-
-Exemplos para os tres numeros de usuarios pedidos:
-
-```powershell
-docker-compose exec -e TARGET_PATHS="/?p=1" locust locust -f locustfile.py --host http://nginx --headless -u 10 -r 10 -t 1m --csv reports/cenario1_3wp_10users
-docker-compose exec -e TARGET_PATHS="/?p=1" locust locust -f locustfile.py --host http://nginx --headless -u 100 -r 10 -t 1m --csv reports/cenario1_3wp_100users
-docker-compose exec -e TARGET_PATHS="/?p=1" locust locust -f locustfile.py --host http://nginx --headless -u 1000 -r 50 -t 1m --csv reports/cenario1_3wp_1000users
-```
-
-Os arquivos `.csv` gerados na pasta `reports/` podem ser usados para montar os graficos do relatorio, comparando:
-
-- tempo medio de resposta;
-- requisicoes por segundo;
-- falhas;
-- percentis de resposta.
-
-## Estrutura do Projeto
-
-- **mysql-db**: contêiner do banco de dados MySQL com armazenamento persistente.
-- **wordpress1, wordpress2, wordpress3**: três contêineres da aplicação WordPress.
-- **nginx**: balanceador de carga responsável por distribuir as requisições entre as instâncias do WordPress utilizando o algoritmo **Round Robin**.
-- **wordpress-net**: rede do tipo **bridge** utilizada para comunicação interna entre os contêineres.
-
-## Pré-requisitos
-
-Antes de executar o projeto, certifique-se de ter instalado em sua máquina:
-
-- [Docker](https://www.docker.com/products/docker-desktop/)
-- [Docker Compose](https://docs.docker.com/compose/)
-
-## Como Executar com Docker Compose
-
-1. Clone este repositório ou baixe os arquivos para uma pasta local.
-2. Verifique se os arquivos `docker-compose.yml` e `nginx.conf` estão no mesmo diretório.
-3. No terminal, execute o comando:
+Para verificar os containers:
 
 ```bash
-docker-compose up -d
+docker ps
 ```
 
-## Para testar:
+Para testar via terminal:
 
-Digite no seu terminal "http://localhost"
-
-OU
-
-Digite no terminal:
 ```bash
 curl -I http://localhost
 ```
 
-## Como Fazer do Zero pelo CMD, sem Utilizar `docker-compose.yml`
+## Executar Manualmente sem Docker Compose
 
-### 1. Criar a rede Docker
-
-Primeiro, crie uma rede isolada para que os contêineres possam se comunicar entre si:
+Crie a rede:
 
 ```bash
 docker network create wordpress-net
 ```
 
-### 2. Criar o contêiner do MySQL
+Crie o MySQL:
 
 ```bash
 docker run -d --name mysql-db --network wordpress-net ^
@@ -190,9 +61,7 @@ docker run -d --name mysql-db --network wordpress-net ^
   mysql:5.7
 ```
 
-### 3. Subir as instâncias do WordPress
-
-#### WordPress 1
+Crie as tres instancias WordPress:
 
 ```bash
 docker run -d --name wordpress1 --network wordpress-net ^
@@ -202,11 +71,7 @@ docker run -d --name wordpress1 --network wordpress-net ^
   -e WORDPRESS_DB_PASSWORD=pwd-wordpress ^
   -e WORDPRESS_DB_NAME=wordpress ^
   wordpress:5.4.2-php7.2-apache
-```
 
-#### WordPress 2
-
-```bash
 docker run -d --name wordpress2 --network wordpress-net ^
   -v %cd%/html:/var/www/html ^
   -e WORDPRESS_DB_HOST=mysql-db ^
@@ -214,11 +79,7 @@ docker run -d --name wordpress2 --network wordpress-net ^
   -e WORDPRESS_DB_PASSWORD=pwd-wordpress ^
   -e WORDPRESS_DB_NAME=wordpress ^
   wordpress:5.4.2-php7.2-apache
-```
 
-#### WordPress 3
-
-```bash
 docker run -d --name wordpress3 --network wordpress-net ^
   -v %cd%/html:/var/www/html ^
   -e WORDPRESS_DB_HOST=mysql-db ^
@@ -228,7 +89,7 @@ docker run -d --name wordpress3 --network wordpress-net ^
   wordpress:5.4.2-php7.2-apache
 ```
 
-### 4. Subir o balanceador de carga com Nginx
+Crie o Nginx:
 
 ```bash
 docker run -d --name nginx -p 80:80 --network wordpress-net ^
@@ -237,13 +98,7 @@ docker run -d --name nginx -p 80:80 --network wordpress-net ^
   nginx:1.19.0
 ```
 
-### 5. Verificar se os contêineres estão rodando
-
-```bash
-docker ps
-```
-
-### 6. Parar e remover toda a infraestrutura
+Para remover a infraestrutura manual:
 
 ```bash
 docker stop mysql-db wordpress1 wordpress2 wordpress3 nginx
@@ -251,26 +106,85 @@ docker rm mysql-db wordpress1 wordpress2 wordpress3 nginx
 docker network rm wordpress-net
 ```
 
-### 7. Realizar testes
+## Trabalho 3 - Testes de Carga com Locust
 
-#### Teste de conectividade
+O Locust foi adicionado ao `docker-compose.yaml` para executar testes de carga contra o Nginx, que distribui as requisicoes entre as instancias WordPress.
 
-```bash
-curl -I http://localhost
+### Cenarios
+
+Foram testados tres posts:
+
+- `/?p=5`: post com imagem de aproximadamente 1 MB.
+- `/?p=10`: post com texto de aproximadamente 400 KB.
+- `/?p=13`: post com imagem de aproximadamente 300 KB.
+
+Cada cenario foi executado variando:
+
+- usuarios simultaneos: `10`, `100`, `1000`;
+- instancias WordPress: `1`, `2`, `3`;
+- duracao por teste: `30s`.
+
+Total:
+
+```text
+3 cenarios x 3 quantidades de usuarios x 3 quantidades de instancias = 27 testes
 ```
 
-#### Verificar se os processos estão ativos
+### Arquivos Importantes
 
-```bash
-docker ps
+- `locust/locustfile.py`: script de comportamento dos usuarios.
+- `scripts/run-load-tests.ps1`: executa todos os testes.
+- `scripts/generate-bar-graphs.py`: gera graficos de barras no estilo solicitado.
+- `reports/summary.csv`: resumo das metricas coletadas.
+- `reports/bar_graphs/`: graficos finais em SVG.
+- `nginx-1.conf`, `nginx-2.conf`, `nginx.conf`: configuracoes para 1, 2 e 3 instancias.
+
+### Rodar Todos os Testes
+
+```powershell
+.\scripts\run-load-tests.ps1 -Duration "30s"
 ```
 
-#### Teste no navegador
+### Gerar os Graficos Novamente
 
-Abra o navegador e acesse:
-
-```bash
-http://localhost
+```powershell
+python scripts/generate-bar-graphs.py
 ```
 
-Se tudo estiver configurado corretamente, a aplicação WordPress deverá ser exibida.
+## Resultados
+
+As metricas analisadas foram:
+
+- tempo medio de resposta;
+- requisicoes por segundo;
+- quantidade de falhas;
+- percentil 95;
+- percentil 99.
+
+### Imagem 1 MB - Tempo Medio por Usuarios
+
+![Imagem 1 MB - Tempo medio por usuarios](reports/bar_graphs/imagem_1mb_tempo_medio_usuarios_x_instancias.svg)
+
+### Imagem 1 MB - Requisicoes por Segundo por Instancias
+
+![Imagem 1 MB - RPS por instancias](reports/bar_graphs/imagem_1mb_requisicoes_por_segundo_instancias_x_usuarios.svg)
+
+### Texto 400 KB - Tempo Medio por Usuarios
+
+![Texto 400 KB - Tempo medio por usuarios](reports/bar_graphs/post_400kb_tempo_medio_usuarios_x_instancias.svg)
+
+### Texto 400 KB - Requisicoes por Segundo por Instancias
+
+![Texto 400 KB - RPS por instancias](reports/bar_graphs/post_400kb_requisicoes_por_segundo_instancias_x_usuarios.svg)
+
+### Imagem 300 KB - Tempo Medio por Usuarios
+
+![Imagem 300 KB - Tempo medio por usuarios](reports/bar_graphs/imagem_300kb_tempo_medio_usuarios_x_instancias.svg)
+
+### Imagem 300 KB - Requisicoes por Segundo por Instancias
+
+![Imagem 300 KB - RPS por instancias](reports/bar_graphs/imagem_300kb_requisicoes_por_segundo_instancias_x_usuarios.svg)
+
+## Observacao
+
+Nos testes com `1000` usuarios simultaneos ocorreram falhas HTTP 500 em alguns cenarios. Esse comportamento indica degradacao da aplicacao sob carga alta e pode ser usado na analise dos resultados.
