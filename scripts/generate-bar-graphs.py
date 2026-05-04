@@ -12,6 +12,7 @@ SCENARIOS = {
     "imagem_1mb": "Imagem 1 MB",
     "post_400kb": "Texto 400 KB",
     "imagem_300kb": "Imagem 300 KB",
+    "hibrido_1mb_texto_400kb": "Hibrido 1 MB + Texto 400 KB",
 }
 
 METRICS = {
@@ -191,7 +192,10 @@ def main():
             for users in (10, 100, 1000):
                 by_users[users] = {}
                 for instances in (1, 2, 3):
-                    value = as_float(lookup[(instances, users)][metric_name]) * scale
+                    row = lookup.get((instances, users))
+                    if row is None:
+                        continue
+                    value = as_float(row[metric_name]) * scale
                     label = f"{instances} instancia" if instances == 1 else f"{instances} instancias"
                     by_users[users][label] = value
 
@@ -209,7 +213,10 @@ def main():
             for instances in (1, 2, 3):
                 by_instances[instances] = {}
                 for users in (10, 100, 1000):
-                    value = as_float(lookup[(instances, users)][metric_name]) * scale
+                    row = lookup.get((instances, users))
+                    if row is None:
+                        continue
+                    value = as_float(row[metric_name]) * scale
                     by_instances[instances][f"{users} usuarios"] = value
 
             build_grouped_bar_svg(

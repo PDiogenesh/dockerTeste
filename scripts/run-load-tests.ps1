@@ -1,16 +1,32 @@
 param(
     [string]$Duration = "1m",
     [int[]]$Users = @(10, 100, 1000),
-    [int[]]$Instances = @(1, 2, 3)
+    [int[]]$Instances = @(1, 2, 3),
+    [string[]]$Scenarios = @()
 )
 
 $ErrorActionPreference = "Stop"
 
-$scenarios = @(
+$scenarioDefinitions = @(
     @{ Key = "imagem_1mb"; Path = "/?p=5"; Description = "Post com imagem de aproximadamente 1 MB" },
     @{ Key = "post_400kb"; Path = "/?p=10"; Description = "Post de aproximadamente 400 KB" },
-    @{ Key = "imagem_300kb"; Path = "/?p=13"; Description = "Post com imagem de aproximadamente 300 KB" }
+    @{ Key = "imagem_300kb"; Path = "/?p=13"; Description = "Post com imagem de aproximadamente 300 KB" },
+    @{ Key = "hibrido_1mb_texto_400kb"; Path = "/?p=17"; Description = "Post hibrido com imagem de aproximadamente 1 MB e texto de aproximadamente 400 KB" }
 )
+
+if ($Scenarios.Count -gt 0) {
+    $requestedScenarios = @(
+        $Scenarios |
+            ForEach-Object { $_ -split "," } |
+            ForEach-Object { $_.Trim() } |
+            Where-Object { $_ }
+    )
+    $scenarioDefinitions = @($scenarioDefinitions | Where-Object { $requestedScenarios -contains $_.Key })
+
+    if ($scenarioDefinitions.Count -eq 0) {
+        throw "Nenhum cenario encontrado. Use um destes: imagem_1mb, post_400kb, imagem_300kb, hibrido_1mb_texto_400kb."
+    }
+}
 
 function Get-NginxConfig([int]$InstanceCount) {
     if ($InstanceCount -eq 1) {
@@ -47,7 +63,7 @@ foreach ($instanceCount in $Instances) {
     docker-compose up -d --force-recreate nginx
     Start-Sleep -Seconds 15
 
-    foreach ($scenario in $scenarios) {
+    foreach ($scenario in $scenarioDefinitions) {
         foreach ($userCount in $Users) {
             $spawnRate = Get-SpawnRate $userCount
             $prefix = "reports/$($scenario.Key)_${instanceCount}wp_${userCount}users"
@@ -68,6 +84,7 @@ foreach ($instanceCount in $Instances) {
 }
 
 python scripts/generate-graphs.py
+python scripts/generate-bar-graphs.py
 
 Write-Host ""
-Write-Host "Testes finalizados. Graficos em reports/graphs."
+Write-Host "Testes finalizados. Graficos em reports/graphs e reports/bar_graphs."

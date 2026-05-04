@@ -1,4 +1,4 @@
 Method,Name,Error,Occurrences
-GET,/?p=5,HTTPError('500 Server Error: Internal Server Error for url: /?p=5'),3497
-GET,/?p=5,RemoteDisconnected('Remote end closed connection without response'),19
-GET,/?p=5,"ConnectionResetError(104, 'Connection reset by peer')",6
+GET,/?p=5,HTTPError('500 Server Error: Internal Server Error for url: /?p=5'),3017
+GET,/?p=5,RemoteDisconnected('Remote end closed connection without response'),40
+GET,/?p=5,"ConnectionResetError(104, 'Connection reset by peer')",5

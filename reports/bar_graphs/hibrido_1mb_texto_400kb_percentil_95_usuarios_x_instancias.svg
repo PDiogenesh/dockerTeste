@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="450.0" y="32" text-anchor="middle" font-family="Arial" font-size="22" font-weight="700">Hibrido 1 MB + Texto 400 KB - Percentil 95 (s)</text>
+<line x1="92" y1="472" x2="684" y2="472" stroke="#111827" stroke-width="1.4"/>
+<line x1="92" y1="472" x2="92" y2="54" stroke="#111827" stroke-width="1.4"/>
+<polygon points="684,472 677,468 677,476" fill="#111827"/>
+<polygon points="92,54 88,62 96,62" fill="#111827"/>
+<text x="381.0" y="532" text-anchor="middle" font-family="Arial" font-size="15">Numero de usuarios</text>
+<text transform="translate(28 271.0) rotate(-90)" text-anchor="middle" font-family="Arial" font-size="15">Percentil 95 (s)</text>
+<line x1="92" y1="391.6" x2="670" y2="391.6" stroke="#e5e7eb"/>
+<text x="80" y="395.6" text-anchor="end" font-family="Arial" font-size="12">2</text>
+<line x1="92" y1="311.2" x2="670" y2="311.2" stroke="#e5e7eb"/>
+<text x="80" y="315.2" text-anchor="end" font-family="Arial" font-size="12">4</text>
+<line x1="92" y1="230.8" x2="670" y2="230.8" stroke="#e5e7eb"/>
+<text x="80" y="234.8" text-anchor="end" font-family="Arial" font-size="12">6</text>
+<line x1="92" y1="150.4" x2="670" y2="150.4" stroke="#e5e7eb"/>
+<text x="80" y="154.4" text-anchor="end" font-family="Arial" font-size="12">8</text>
+<line x1="92" y1="70.0" x2="670" y2="70.0" stroke="#e5e7eb"/>
+<text x="80" y="74.0" text-anchor="end" font-family="Arial" font-size="12">10</text>
+<text x="188.3" y="498" text-anchor="middle" font-family="Arial" font-size="13">10</text>
+<rect x="114.3" y="440.6" width="44.0" height="31.4" fill="#cfe0ef" stroke="#333333" stroke-width="1"/>
+<rect x="166.3" y="457.5" width="44.0" height="14.5" fill="#f4dfc6" stroke="#333333" stroke-width="1"/>
+<rect x="218.3" y="456.7" width="44.0" height="15.3" fill="#efc7c7" stroke="#333333" stroke-width="1"/>
+<text x="381.0" y="498" text-anchor="middle" font-family="Arial" font-size="13">100</text>
+<rect x="307.0" y="464.4" width="44.0" height="7.6" fill="#cfe0ef" stroke="#333333" stroke-width="1"/>
+<rect x="359.0" y="464.4" width="44.0" height="7.6" fill="#f4dfc6" stroke="#333333" stroke-width="1"/>
+<rect x="411.0" y="464.8" width="44.0" height="7.2" fill="#efc7c7" stroke="#333333" stroke-width="1"/>
+<text x="573.7" y="498" text-anchor="middle" font-family="Arial" font-size="13">1000</text>
+<rect x="499.7" y="267.0" width="44.0" height="205.0" fill="#cfe0ef" stroke="#333333" stroke-width="1"/>
+<rect x="551.7" y="299.1" width="44.0" height="172.9" fill="#f4dfc6" stroke="#333333" stroke-width="1"/>
+<rect x="603.7" y="339.3" width="44.0" height="132.7" fill="#efc7c7" stroke="#333333" stroke-width="1"/>
+<rect x="706" y="69" width="28" height="16" fill="#cfe0ef" stroke="#333333"/>
+<text x="742" y="82" font-family="Arial" font-size="14">1 instancia</text>
+<rect x="706" y="97" width="28" height="16" fill="#f4dfc6" stroke="#333333"/>
+<text x="742" y="110" font-family="Arial" font-size="14">2 instancias</text>
+<rect x="706" y="125" width="28" height="16" fill="#efc7c7" stroke="#333333"/>
+<text x="742" y="138" font-family="Arial" font-size="14">3 instancias</text>
+</svg>

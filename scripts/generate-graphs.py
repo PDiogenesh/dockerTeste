@@ -13,6 +13,7 @@ SCENARIO_LABELS = {
     "imagem_1mb": "Imagem 1 MB",
     "post_400kb": "Post 400 KB",
     "imagem_300kb": "Imagem 300 KB",
+    "hibrido_1mb_texto_400kb": "Hibrido 1 MB + Texto 400 KB",
 }
 
 METRICS = {
@@ -55,10 +56,13 @@ def load_results():
             continue
 
         scenario = match.group("scenario")
+        if scenario not in SCENARIO_LABELS:
+            continue
+
         rows.append(
             {
                 "scenario": scenario,
-                "scenario_label": SCENARIO_LABELS.get(scenario, scenario),
+                "scenario_label": SCENARIO_LABELS[scenario],
                 "instances": int(match.group("instances")),
                 "users": int(match.group("users")),
                 **{metric: as_float(aggregate.get(metric)) for metric in METRICS},

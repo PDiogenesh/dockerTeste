@@ -112,11 +112,12 @@ O Locust foi adicionado ao `docker-compose.yaml` para executar testes de carga c
 
 ### Cenarios
 
-Foram testados tres posts:
+Foram testados quatro posts:
 
 - `/?p=5`: post com imagem de aproximadamente 1 MB.
 - `/?p=10`: post com texto de aproximadamente 400 KB.
 - `/?p=13`: post com imagem de aproximadamente 300 KB.
+- `/?p=17`: post hibrido com imagem de aproximadamente 1 MB e texto de aproximadamente 400 KB.
 
 Cada cenario foi executado variando:
 
@@ -127,7 +128,7 @@ Cada cenario foi executado variando:
 Total:
 
 ```text
-3 cenarios x 3 quantidades de usuarios x 3 quantidades de instancias = 27 testes
+4 cenarios x 3 quantidades de usuarios x 3 quantidades de instancias = 36 testes
 ```
 
 ### Arquivos Importantes
@@ -143,6 +144,12 @@ Total:
 
 ```powershell
 .\scripts\run-load-tests.ps1 -Duration "30s"
+```
+
+Para rodar apenas alguns cenarios, informe as chaves desejadas:
+
+```powershell
+.\scripts\run-load-tests.ps1 -Duration "30s" -Scenarios imagem_1mb,hibrido_1mb_texto_400kb
 ```
 
 ### Gerar os Graficos Novamente
@@ -185,6 +192,14 @@ As metricas analisadas foram:
 
 ![Imagem 300 KB - RPS por instancias](reports/bar_graphs/imagem_300kb_requisicoes_por_segundo_instancias_x_usuarios.svg)
 
+### Hibrido 1 MB + Texto 400 KB - Tempo Medio por Usuarios
+
+![Hibrido 1 MB + Texto 400 KB - Tempo medio por usuarios](reports/bar_graphs/hibrido_1mb_texto_400kb_tempo_medio_usuarios_x_instancias.svg)
+
+### Hibrido 1 MB + Texto 400 KB - Requisicoes por Segundo por Instancias
+
+![Hibrido 1 MB + Texto 400 KB - RPS por instancias](reports/bar_graphs/hibrido_1mb_texto_400kb_requisicoes_por_segundo_instancias_x_usuarios.svg)
+
 ## Observacao
 
-Nos testes com `1000` usuarios simultaneos ocorreram falhas HTTP 500 em alguns cenarios. Esse comportamento indica degradacao da aplicacao sob carga alta e pode ser usado na analise dos resultados.
+Nos testes com `1000` usuarios simultaneos ocorreram falhas HTTP 500 em alguns cenarios. No teste hibrido com 3 instancias e 1000 usuarios, o Locust tambem registrou aviso de CPU acima de 90%, o que pode afetar a consistencia das medicoes nessa carga. Esse comportamento indica degradacao da aplicacao sob carga alta e pode ser usado na analise dos resultados.

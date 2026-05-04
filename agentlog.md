@@ -1,6 +1,33 @@
 # Agent Log - Contexto do Projeto
 
-Atualizado em: 2026-04-30
+Atualizado em: 2026-05-04
+
+## Atualizacao 2026-05-04
+
+O Trabalho 3 foi ajustado para a matriz atual pedida pelo usuario:
+
+- `/?p=5`: `imagem_1mb`, post com imagem de aproximadamente 1 MB.
+- `/?p=10`: `post_400kb`, texto de aproximadamente 400 KB.
+- `/?p=13`: `imagem_300kb`, imagem de aproximadamente 300 KB.
+- `/?p=17`: `hibrido_1mb_texto_400kb`, imagem de aproximadamente 1 MB e texto de aproximadamente 400 KB.
+
+A matriz consolidada agora e:
+
+```text
+4 cenarios x 3 quantidades de usuarios x 3 quantidades de instancias = 36 testes
+```
+
+Foram executados os 18 testes complementares para `imagem_1mb` e `hibrido_1mb_texto_400kb` com duracao de `30s`; os 18 testes de `post_400kb` e `imagem_300kb` ja existiam e foram reaproveitados no consolidado. O arquivo `reports/summary.csv` ficou com 36 linhas, 9 por cenario.
+
+O script `scripts/run-load-tests.ps1` agora aceita filtro por cenario:
+
+```powershell
+.\scripts\run-load-tests.ps1 -Duration "30s" -Scenarios imagem_1mb,hibrido_1mb_texto_400kb
+```
+
+Os geradores `scripts/generate-graphs.py` e `scripts/generate-bar-graphs.py` foram atualizados para considerar apenas os 4 cenarios atuais no resumo/graficos novos.
+
+Observacao dos testes: em 1000 usuarios, o cenario hibrido teve falhas HTTP 500 e o Locust registrou aviso de CPU acima de 90% em pelo menos uma execucao, entao essa carga deve ser interpretada como saturacao do ambiente.
 
 ## Visao geral
 

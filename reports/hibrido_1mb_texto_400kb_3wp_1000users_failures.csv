@@ -1,0 +1,4 @@
+Method,Name,Error,Occurrences
+GET,/?p=17,"ConnectionResetError(104, 'Connection reset by peer')",5
+GET,/?p=17,HTTPError('500 Server Error: Internal Server Error for url: /?p=17'),2382
+GET,/?p=17,RemoteDisconnected('Remote end closed connection without response'),50

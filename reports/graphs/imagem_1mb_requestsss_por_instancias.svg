@@ -23,22 +23,22 @@
 <text x="488.0" y="506" text-anchor="middle" font-family="Arial" font-size="12">2</text>
 <line x1="888.0" y1="482" x2="888.0" y2="488" stroke="#111827"/>
 <text x="888.0" y="506" text-anchor="middle" font-family="Arial" font-size="12">3</text>
-<polyline fill="none" stroke="#2563eb" stroke-width="3" points="88.0,477.6 488.0,477.8 888.0,477.9"/>
-<circle cx="88.0" cy="477.6" r="4" fill="#2563eb"/>
-<circle cx="488.0" cy="477.8" r="4" fill="#2563eb"/>
-<circle cx="888.0" cy="477.9" r="4" fill="#2563eb"/>
+<polyline fill="none" stroke="#2563eb" stroke-width="3" points="88.0,477.7 488.0,477.9 888.0,477.8"/>
+<circle cx="88.0" cy="477.7" r="4" fill="#2563eb"/>
+<circle cx="488.0" cy="477.9" r="4" fill="#2563eb"/>
+<circle cx="888.0" cy="477.8" r="4" fill="#2563eb"/>
 <rect x="718" y="46" width="14" height="14" fill="#2563eb"/>
 <text x="738" y="58" font-family="Arial" font-size="13">10 usuarios</text>
-<polyline fill="none" stroke="#dc2626" stroke-width="3" points="88.0,442.8 488.0,442.1 888.0,442.6"/>
-<circle cx="88.0" cy="442.8" r="4" fill="#dc2626"/>
-<circle cx="488.0" cy="442.1" r="4" fill="#dc2626"/>
-<circle cx="888.0" cy="442.6" r="4" fill="#dc2626"/>
+<polyline fill="none" stroke="#dc2626" stroke-width="3" points="88.0,442.3 488.0,442.4 888.0,442.8"/>
+<circle cx="88.0" cy="442.3" r="4" fill="#dc2626"/>
+<circle cx="488.0" cy="442.4" r="4" fill="#dc2626"/>
+<circle cx="888.0" cy="442.8" r="4" fill="#dc2626"/>
 <rect x="718" y="70" width="14" height="14" fill="#dc2626"/>
 <text x="738" y="82" font-family="Arial" font-size="13">100 usuarios</text>
-<polyline fill="none" stroke="#16a34a" stroke-width="3" points="88.0,319.6 488.0,259.5 888.0,262.3"/>
-<circle cx="88.0" cy="319.6" r="4" fill="#16a34a"/>
-<circle cx="488.0" cy="259.5" r="4" fill="#16a34a"/>
-<circle cx="888.0" cy="262.3" r="4" fill="#16a34a"/>
+<polyline fill="none" stroke="#16a34a" stroke-width="3" points="88.0,308.2 488.0,266.9 888.0,258.6"/>
+<circle cx="88.0" cy="308.2" r="4" fill="#16a34a"/>
+<circle cx="488.0" cy="266.9" r="4" fill="#16a34a"/>
+<circle cx="888.0" cy="258.6" r="4" fill="#16a34a"/>
 <rect x="718" y="94" width="14" height="14" fill="#16a34a"/>
 <text x="738" y="106" font-family="Arial" font-size="13">1000 usuarios</text>
 </svg>
