@@ -170,11 +170,11 @@ As metricas analisadas foram:
 
 ### Imagem 1 MB - Tempo Medio por Usuarios
 
-![Imagem 1 MB - Tempo medio por usuarios](reports/bar_graphs/imagem_1mb_tempo_medio_usuarios_x_instancias.svg)
+![Imagem 1 MB - Tempo medio por usuarios](reports/bar_graphs/imagem_1mb_tempo_medio_usuarios_x_instancias_readme.svg)
 
 ### Imagem 1 MB - Requisicoes por Segundo por Instancias
 
-![Imagem 1 MB - RPS por instancias](reports/bar_graphs/imagem_1mb_requisicoes_por_segundo_instancias_x_usuarios.svg)
+![Imagem 1 MB - RPS por instancias](reports/bar_graphs/imagem_1mb_requisicoes_por_segundo_instancias_x_usuarios_readme.svg)
 
 ### Texto 400 KB - Tempo Medio por Usuarios
 
