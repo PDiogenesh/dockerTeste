@@ -10,21 +10,19 @@ REPORTS_DIR = Path("reports")
 GRAPHS_DIR = REPORTS_DIR / "graphs"
 
 SCENARIO_LABELS = {
-    "imagem_1mb": "Imagem 1 MB",
-    "post_400kb": "Post 400 KB",
-    "imagem_300kb": "Imagem 300 KB",
-    "hibrido_1mb_texto_400kb": "Hibrido 1 MB + Texto 400 KB",
+    "texto_300kb":  "Texto 300 KB",
+    "texto_400kb":  "Texto 400 KB",
+    "imagem_1mb":   "Imagem 1 MB",
+    "hibrido_3pag": "Hibrido (3 paginas)",
 }
 
 METRICS = {
-    "Average Response Time": "Tempo medio de resposta (ms)",
-    "Requests/s": "Requisicoes por segundo",
+    "95%":           "P95 - Tempo de resposta (ms)",
     "Failure Count": "Falhas",
-    "95%": "Percentil 95 (ms)",
-    "99%": "Percentil 99 (ms)",
 }
 
 COLORS = ["#2563eb", "#dc2626", "#16a34a", "#9333ea", "#ea580c"]
+USERS = [152, 155, 159]
 FILENAME_RE = re.compile(r"^(?P<scenario>.+)_(?P<instances>[123])wp_(?P<users>\d+)users_stats\.csv$")
 
 
@@ -65,6 +63,7 @@ def load_results():
                 "scenario_label": SCENARIO_LABELS[scenario],
                 "instances": int(match.group("instances")),
                 "users": int(match.group("users")),
+                "Request Count": as_float(aggregate.get("Request Count", 0)),
                 **{metric: as_float(aggregate.get(metric)) for metric in METRICS},
             }
         )
@@ -138,7 +137,7 @@ def make_svg(title, x_label, y_label, series, output_path):
 
 def write_summary(rows):
     summary_path = REPORTS_DIR / "summary.csv"
-    fieldnames = ["scenario", "instances", "users", *METRICS.keys()]
+    fieldnames = ["scenario", "instances", "users", "Request Count", *METRICS.keys()]
     with summary_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
@@ -164,8 +163,9 @@ def main():
             by_instances = defaultdict(list)
             by_users = defaultdict(list)
             for row in scenario_rows:
-                by_instances[f'{row["instances"]} WP'].append((row["users"], row[metric]))
-                by_users[f'{row["users"]} usuarios'].append((row["instances"], row[metric]))
+                if row["users"] in USERS:
+                    by_instances[f'{row["instances"]} WP'].append((row["users"], row[metric]))
+                    by_users[f'{row["users"]} usuarios'].append((row["instances"], row[metric]))
 
             safe_metric = metric.lower().replace("/", "s").replace("%", "pct").replace(" ", "_")
             make_svg(

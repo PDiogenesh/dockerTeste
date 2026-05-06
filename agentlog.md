@@ -1,6 +1,39 @@
 # Agent Log - Contexto do Projeto
 
-Atualizado em: 2026-05-04
+Atualizado em: 2026-05-05
+
+## Atualizacao 2026-05-05 - Orientacoes do professor
+
+Mudancas aplicadas conforme orientacoes passadas em aula:
+
+### 1. `locust/locustfile.py`
+- Removido `wait_time` (era `between(1, 3)`) → substituido por `constant(0)` para requisicoes contínuas sem pausa.
+- O cenario hibrido agora usa TARGET_PATHS com multiplos paths separados por virgula (ex: `/?p=5,/?p=10,/?p=13`), resultando em 3 GETs em sequencia por iteracao do usuario.
+- Apenas GETs (sem POST, login, etc.).
+
+### 2. `scripts/run-load-tests.ps1`
+- Quantidades de usuarios alteradas para `150, 200, 250` (zona de transicao mais interessante para analise).
+- Cenario hibrido renomeado de `hibrido_1mb_texto_400kb` (/?p=17) para `hibrido_3gets` com TARGET_PATHS=`/?p=5,/?p=10,/?p=13` (3 GETs em sequencia).
+  - Motivo: o Locust nao baixa as imagens embutidas no HTML do WordPress, entao o `/?p=17` com imagem de 1MB nao testava o tamanho real. O cenario hibrido agora pede os 3 posts em sequencia, variando o tamanho de pagina.
+- Taxas de spawn ajustadas para 15, 20 e 25.
+
+### 3. `scripts/generate-bar-graphs.py`
+- Metricas reduzidas a APENAS 2 conforme pedido do professor:
+  - **P95** (percentil 95 em ms) - eixo Y fixo em **1800 ms** para todos os graficos de tempo (mesma escala para comparacao).
+  - **Taxa de falha (%)** - calculada como `falhas / total * 100`.
+- Eixo X: numero de usuarios (150, 200, 250) OU numero de instancias (1, 2, 3).
+- Valores numericos exibidos acima de cada barra.
+- Cenario hibrido atualizado para `hibrido_3gets`.
+
+### 4. `scripts/generate-graphs.py`
+- Cenario `hibrido_1mb_texto_400kb` substituido por `hibrido_3gets`.
+- Metricas reduzidas a P95 e Falhas.
+- Usuarios atualizados para 150, 200, 250.
+
+### Problema das imagens no Locust
+O Locust faz GET apenas na pagina HTML do WordPress, nao baixa os recursos embutidos (imagens, CSS, JS). Portanto, um post com imagem de 1MB no WordPress nao resulta em 1MB transferido por requisicao Locust - apenas o HTML e baixado (~alguns KB). Para contornar isso sem complicar demais, o cenario hibrido foi redesenhado para fazer 3 GETs em sequencia (paginas de tamanhos diferentes), o que aumenta a carga por iteracao de usuario e varia o tamanho de transferencia por ciclo.
+
+---
 
 ## Atualizacao 2026-05-04
 
