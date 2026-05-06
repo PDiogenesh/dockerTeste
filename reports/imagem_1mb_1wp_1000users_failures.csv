@@ -1,3 +1,0 @@
-Method,Name,Error,Occurrences
-GET,/?p=5,RemoteDisconnected('Remote end closed connection without response'),1083
-GET,/?p=5,"ConnectionResetError(104, 'Connection reset by peer')",115
