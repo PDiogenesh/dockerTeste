@@ -1,17 +1,41 @@
 param(
     [string]$Duration = "1m",
-    [int[]]$Users = @(10, 100, 1000),
+    [int[]]$Users = @(152, 155, 159),
     [int[]]$Instances = @(1, 2, 3),
     [string[]]$Scenarios = @()
 )
 
 $ErrorActionPreference = "Stop"
 
+# URL da imagem de 1 MB (caminho relativo dentro do WordPress)
+$img1mb = "/wp-content/uploads/2026/05/AsterNovi-belgii-flower-1mb-1.jpg"
+
+# Cenarios:
+#   texto_300kb  -> GET /?p=5  (post so texto, ~300 KB)
+#   texto_400kb  -> GET /?p=8  (post so texto, ~400 KB)
+#   imagem_1mb   -> GET /?p=15 + GET da imagem (HTML + imagem ~1 MB)
+#   hibrido_3pag -> GET /?p=5, GET /?p=8, GET /?p=15 + imagem (3 paginas em sequencia)
 $scenarioDefinitions = @(
-    @{ Key = "imagem_1mb"; Path = "/?p=5"; Description = "Post com imagem de aproximadamente 1 MB" },
-    @{ Key = "post_400kb"; Path = "/?p=10"; Description = "Post de aproximadamente 400 KB" },
-    @{ Key = "imagem_300kb"; Path = "/?p=13"; Description = "Post com imagem de aproximadamente 300 KB" },
-    @{ Key = "hibrido_1mb_texto_400kb"; Path = "/?p=17"; Description = "Post hibrido com imagem de aproximadamente 1 MB e texto de aproximadamente 400 KB" }
+    @{
+        Key         = "texto_300kb"
+        Path        = "/?p=5"
+        Description = "Post de texto de aproximadamente 300 KB"
+    },
+    @{
+        Key         = "texto_400kb"
+        Path        = "/?p=8"
+        Description = "Post de texto de aproximadamente 400 KB"
+    },
+    @{
+        Key         = "imagem_1mb"
+        Path        = "/?p=15,$img1mb"
+        Description = "Post com imagem de 1 MB (HTML + GET explicito da imagem)"
+    },
+    @{
+        Key         = "hibrido_3pag"
+        Path        = "/?p=5,/?p=8,/?p=15,$img1mb"
+        Description = "Hibrido: GET 300 KB + GET 400 KB + GET 1 MB (HTML + imagem) em sequencia"
+    }
 )
 
 if ($Scenarios.Count -gt 0) {
@@ -24,32 +48,20 @@ if ($Scenarios.Count -gt 0) {
     $scenarioDefinitions = @($scenarioDefinitions | Where-Object { $requestedScenarios -contains $_.Key })
 
     if ($scenarioDefinitions.Count -eq 0) {
-        throw "Nenhum cenario encontrado. Use um destes: imagem_1mb, post_400kb, imagem_300kb, hibrido_1mb_texto_400kb."
+        throw "Nenhum cenario encontrado. Use: texto_300kb, texto_400kb, imagem_1mb, hibrido_3pag."
     }
 }
 
 function Get-NginxConfig([int]$InstanceCount) {
-    if ($InstanceCount -eq 1) {
-        return "./nginx-1.conf"
-    }
-
-    if ($InstanceCount -eq 2) {
-        return "./nginx-2.conf"
-    }
-
+    if ($InstanceCount -eq 1) { return "./nginx-1.conf" }
+    if ($InstanceCount -eq 2) { return "./nginx-2.conf" }
     return "./nginx.conf"
 }
 
 function Get-SpawnRate([int]$UserCount) {
-    if ($UserCount -le 10) {
-        return 10
-    }
-
-    if ($UserCount -le 100) {
-        return 20
-    }
-
-    return 50
+    if ($UserCount -le 152) { return 15 }
+    if ($UserCount -le 155) { return 15 }
+    return 16
 }
 
 New-Item -ItemType Directory -Force -Path "reports" | Out-Null
@@ -69,7 +81,7 @@ foreach ($instanceCount in $Instances) {
             $prefix = "reports/$($scenario.Key)_${instanceCount}wp_${userCount}users"
 
             Write-Host ""
-            Write-Host "=== Teste: $($scenario.Description) | $instanceCount WP | $userCount usuarios | $Duration ==="
+            Write-Host "=== $($scenario.Description) | $instanceCount WP | $userCount usuarios | $Duration ==="
             docker-compose exec -e TARGET_PATHS="$($scenario.Path)" locust locust `
                 -f locustfile.py `
                 --host http://nginx `

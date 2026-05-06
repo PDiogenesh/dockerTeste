@@ -1,6 +1,6 @@
 import os
 
-from locust import HttpUser, between, task
+from locust import HttpUser, constant, task
 
 
 def _target_paths():
@@ -9,10 +9,8 @@ def _target_paths():
 
 
 class WordpressUser(HttpUser):
-    wait_time = between(
-        float(os.getenv("WAIT_TIME_MIN", "1")),
-        float(os.getenv("WAIT_TIME_MAX", "3")),
-    )
+    # Sem espera entre tarefas: usuarios fazem requisicoes continuamente
+    wait_time = constant(0)
 
     @task
     def view_posts(self):

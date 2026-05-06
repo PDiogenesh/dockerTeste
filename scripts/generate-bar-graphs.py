@@ -8,51 +8,45 @@ from pathlib import Path
 SUMMARY_PATH = Path("reports") / "summary.csv"
 OUTPUT_DIR = Path("reports") / "bar_graphs"
 
+# Cenarios atuais (hibrido renomeado para hibrido_3gets)
 SCENARIOS = {
-    "imagem_1mb": "Imagem 1 MB",
-    "post_400kb": "Texto 400 KB",
-    "imagem_300kb": "Imagem 300 KB",
-    "hibrido_1mb_texto_400kb": "Hibrido 1 MB + Texto 400 KB",
+    "texto_300kb":  "Texto 300 KB",
+    "texto_400kb":  "Texto 400 KB",
+    "imagem_1mb":   "Imagem 1 MB",
+    "hibrido_3pag": "Hibrido (3 paginas)",
 }
 
+# Quantidades de usuarios usadas nos testes
+USERS = [152, 155, 159]
+
+# --------------------------------------------------------------------------
+# Metricas solicitadas pelo professor:
+#   Y = P95  OU  taxa de falha (%)
+# --------------------------------------------------------------------------
 METRICS = {
-    "Average Response Time": {
-        "label": "Tempo medio de resposta (s)",
-        "suffix": "tempo_medio",
-        "scale": 0.001,
-    },
-    "Requests/s": {
-        "label": "Requisicoes por segundo",
-        "suffix": "requisicoes_por_segundo",
-        "scale": 1,
-    },
-    "Failure Count": {
-        "label": "Quantidade de falhas",
-        "suffix": "falhas",
-        "scale": 1,
-    },
     "95%": {
-        "label": "Percentil 95 (s)",
-        "suffix": "percentil_95",
-        "scale": 0.001,
+        "label": "P95 - Tempo de resposta (ms)",
+        "suffix": "p95",
+        "scale": 1,         # ja esta em ms no CSV
+        "y_max": 1800,      # eixo Y fixo em 1800 ms para comparar graficos
     },
-    "99%": {
-        "label": "Percentil 99 (s)",
-        "suffix": "percentil_99",
-        "scale": 0.001,
+    "failure_rate": {
+        "label": "Taxa de falha (%)",
+        "suffix": "taxa_falha",
+        "scale": 1,
+        "y_max": None,      # escala automatica
     },
 }
 
 INSTANCE_COLORS = {
-    "1 instancia": "#cfe0ef",
+    "1 instancia":  "#cfe0ef",
     "2 instancias": "#f4dfc6",
     "3 instancias": "#efc7c7",
 }
 
 USER_COLORS = {
-    "10 usuarios": "#d9ead3",
-    "100 usuarios": "#d9e5e8",
-    "1000 usuarios": "#fff0c6",
+    f"{u} usuarios": color
+    for u, color in zip(USERS, ["#d9ead3", "#d9e5e8", "#fff0c6"])
 }
 
 
@@ -64,16 +58,21 @@ def as_float(value):
 
 
 def load_rows():
+    rows = []
     with SUMMARY_PATH.open(newline="", encoding="utf-8") as handle:
-        return [
-            {
+        for row in csv.DictReader(handle):
+            if row.get("scenario") not in SCENARIOS:
+                continue
+            total = as_float(row.get("Request Count", 0))
+            failures = as_float(row.get("Failure Count", 0))
+            rate = (failures / total * 100) if total > 0 else 0.0
+            rows.append({
                 **row,
                 "instances": int(row["instances"]),
                 "users": int(row["users"]),
-            }
-            for row in csv.DictReader(handle)
-            if row.get("scenario") in SCENARIOS
-        ]
+                "failure_rate": rate,
+            })
+    return rows
 
 
 def nice_max(value):
@@ -98,7 +97,7 @@ def format_tick(value):
     return f"{value:.3f}".rstrip("0").rstrip(".")
 
 
-def build_grouped_bar_svg(title, x_label, y_label, groups, series, colors, output_path):
+def build_grouped_bar_svg(title, x_label, y_label, groups, series, colors, output_path, fixed_y_max=None):
     width = 900
     height = 560
     left = 92
@@ -109,7 +108,10 @@ def build_grouped_bar_svg(title, x_label, y_label, groups, series, colors, outpu
     plot_height = height - top - bottom
 
     values = [value for group in groups for value in series[group].values()]
-    y_max = nice_max(max(values) if values else 1)
+    if fixed_y_max is not None:
+        y_max = fixed_y_max
+    else:
+        y_max = nice_max(max(values) if values else 1)
 
     group_count = len(groups)
     series_names = list(next(iter(series.values())).keys()) if series else []
@@ -118,12 +120,12 @@ def build_grouped_bar_svg(title, x_label, y_label, groups, series, colors, outpu
     bar_width = min(44, (group_width - 34) / max(1, len(series_names)) - bar_gap)
 
     def y_pos(value):
-        return top + plot_height - (value / y_max * plot_height)
+        return top + plot_height - (min(value, y_max) / y_max * plot_height)
 
     svg = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
         '<rect width="100%" height="100%" fill="#ffffff"/>',
-        f'<text x="{width / 2}" y="32" text-anchor="middle" font-family="Arial" font-size="22" font-weight="700">{html.escape(title)}</text>',
+        f'<text x="{width / 2}" y="32" text-anchor="middle" font-family="Arial" font-size="20" font-weight="700">{html.escape(title)}</text>',
         f'<line x1="{left}" y1="{top + plot_height}" x2="{left + plot_width + 14}" y2="{top + plot_height}" stroke="#111827" stroke-width="1.4"/>',
         f'<line x1="{left}" y1="{top + plot_height}" x2="{left}" y2="{top - 16}" stroke="#111827" stroke-width="1.4"/>',
         f'<polygon points="{left + plot_width + 14},{top + plot_height} {left + plot_width + 7},{top + plot_height - 4} {left + plot_width + 7},{top + plot_height + 4}" fill="#111827"/>',
@@ -153,6 +155,12 @@ def build_grouped_bar_svg(title, x_label, y_label, groups, series, colors, outpu
             svg.append(
                 f'<rect x="{x:.1f}" y="{y:.1f}" width="{bar_width:.1f}" height="{bar_height:.1f}" '
                 f'fill="{colors[series_name]}" stroke="#333333" stroke-width="1"/>'
+            )
+            # Valor acima da barra
+            label_y = y - 5
+            svg.append(
+                f'<text x="{x + bar_width / 2:.1f}" y="{label_y:.1f}" text-anchor="middle" '
+                f'font-family="Arial" font-size="10" fill="#333333">{format_tick(value)}</text>'
             )
 
     legend_x = left + plot_width + 36
@@ -184,18 +192,22 @@ def main():
             for row in scenario_rows
         }
 
-        for metric_name, metric_info in METRICS.items():
+        for metric_key, metric_info in METRICS.items():
             metric_label = metric_info["label"]
-            scale = metric_info["scale"]
+            fixed_y_max = metric_info["y_max"]
 
+            # --- Grafico 1: X = usuarios, barras por instancias ---
             by_users = {}
-            for users in (10, 100, 1000):
+            for users in USERS:
                 by_users[users] = {}
                 for instances in (1, 2, 3):
                     row = lookup.get((instances, users))
                     if row is None:
                         continue
-                    value = as_float(row[metric_name]) * scale
+                    if metric_key == "failure_rate":
+                        value = row["failure_rate"]
+                    else:
+                        value = as_float(row.get(metric_key, 0))
                     label = f"{instances} instancia" if instances == 1 else f"{instances} instancias"
                     by_users[users][label] = value
 
@@ -203,20 +215,28 @@ def main():
                 title=f"{scenario_label} - {metric_label}",
                 x_label="Numero de usuarios",
                 y_label=metric_label,
-                groups=[10, 100, 1000],
+                groups=USERS,
                 series=by_users,
                 colors=INSTANCE_COLORS,
                 output_path=OUTPUT_DIR / f"{scenario}_{metric_info['suffix']}_usuarios_x_instancias.svg",
+                fixed_y_max=fixed_y_max,
             )
+
+            # --- Grafico 2: X = instancias, barras por usuarios ---
+            user_colors_keys = [f"{u} usuarios" for u in USERS]
+            user_colors = {k: c for k, c in zip(user_colors_keys, ["#d9ead3", "#d9e5e8", "#fff0c6"])}
 
             by_instances = {}
             for instances in (1, 2, 3):
                 by_instances[instances] = {}
-                for users in (10, 100, 1000):
+                for users in USERS:
                     row = lookup.get((instances, users))
                     if row is None:
                         continue
-                    value = as_float(row[metric_name]) * scale
+                    if metric_key == "failure_rate":
+                        value = row["failure_rate"]
+                    else:
+                        value = as_float(row.get(metric_key, 0))
                     by_instances[instances][f"{users} usuarios"] = value
 
             build_grouped_bar_svg(
@@ -225,8 +245,9 @@ def main():
                 y_label=metric_label,
                 groups=[1, 2, 3],
                 series=by_instances,
-                colors=USER_COLORS,
+                colors=user_colors,
                 output_path=OUTPUT_DIR / f"{scenario}_{metric_info['suffix']}_instancias_x_usuarios.svg",
+                fixed_y_max=fixed_y_max,
             )
 
     print(f"Graficos de barras gerados em {OUTPUT_DIR}")
