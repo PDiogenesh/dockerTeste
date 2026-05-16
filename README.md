@@ -2,6 +2,12 @@
 
 Este projeto implementa uma infraestrutura com Docker composta por MySQL, tres instancias WordPress e um balanceador de carga Nginx. O objetivo e distribuir as requisicoes entre as instancias da aplicacao usando Round Robin.
 
+## Integrantes
+| Pedro Diógenes
+| Erich Schlaepfer
+| Rebeca Pinheiro 
+| Matheus Vasconcelos 
+
 ## Estrutura
 
 - `mysql-db`: banco de dados MySQL com armazenamento persistente em `mysql_data/`.
